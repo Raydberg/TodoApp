@@ -2,6 +2,10 @@ package com.example.todoapp
 
 import android.app.Dialog
 import android.os.Bundle
+import android.widget.Button
+import android.widget.EditText
+import android.widget.RadioButton
+import android.widget.RadioGroup
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -50,7 +54,7 @@ class MainActivity : AppCompatActivity() {
         rvCategories.adapter = categoriesAdapter;
 
 
-        taskAdapter = TasksAdapter(tasks)
+        taskAdapter = TasksAdapter(tasks,)
         //Por defecto ya es vertical asi que solo ponemos this
         rvTasks.layoutManager = LinearLayoutManager(this)
         rvTasks.adapter = taskAdapter
@@ -73,5 +77,50 @@ class MainActivity : AppCompatActivity() {
     private fun showDialog() {
         //Dialogo
         val dialog = Dialog(this)
+        //Ponerle nuestro diseño
+        dialog.setContentView(R.layout.dialog_task)
+        //Encontrar los elementos dentro del dialog
+        val btnAddTask: Button = dialog.findViewById(R.id.btnAddTask)
+        val etTask: EditText = dialog.findViewById(R.id.etTask)
+        val rgCategories: RadioGroup = dialog.findViewById(R.id.rgCategories)
+
+        btnAddTask.setOnClickListener {
+            val currenttask = etTask.text.toString()
+            if (currenttask.isNotEmpty()) {
+                //Obtener el Id del boton que tenemos selecionado
+                val selectedId = rgCategories.checkedRadioButtonId
+                //Acceder al boton selecionado en base al id capturado en el RadioGroup
+                val selectedRadioButton: RadioButton = rgCategories.findViewById(selectedId)
+                val currentCategory: TaskCategory =
+                    when (selectedRadioButton.text) {
+                        "Negocios" -> TaskCategory.Business
+                        "Personal" -> TaskCategory.Personal
+                        else -> TaskCategory.Other
+                    }
+                //Añadir la tarea
+                tasks.add(Task(currenttask, currentCategory))
+                //Avisamos al adaptar que se añadio nuevos items
+                updateTask()
+                //Cerrar el dialogo
+                dialog.hide()
+            }
+        }
+
+        //Mostrar nuestra vista
+        dialog.show()
     }
+
+    //Avisar al adaptador que se añadio un nuevo item
+    private fun updateTask() {
+        //Esto comprueba uno a uno -> No Optimo
+        taskAdapter.notifyDataSetChanged()
+    }
+
+
+    private fun onItemSelected(position: Int) {
+        tasks[position].isSelected = !tasks[position].isSelected
+        //Notificar cambios
+        updateTask()
+    }
+
 }
