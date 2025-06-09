@@ -47,14 +47,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initUI() {
-        categoriesAdapter = CategoriesAdapter(categories)
+        categoriesAdapter = CategoriesAdapter(categories) { updateCategories(it) }
         //Se encarga de poderle indicar si es scroll vertical u horizontal
         rvCategories.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         rvCategories.adapter = categoriesAdapter;
 
 
-        taskAdapter = TasksAdapter(tasks,)
+//        taskAdapter = TasksAdapter(tasks, { onItemSelected(it) })
+//        taskAdapter = TasksAdapter(tasks, { position -> onItemSelected(position) })
+        taskAdapter = TasksAdapter(tasks) { position -> onItemSelected(position) }
         //Por defecto ya es vertical asi que solo ponemos this
         rvTasks.layoutManager = LinearLayoutManager(this)
         rvTasks.adapter = taskAdapter
@@ -110,17 +112,30 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    //Avisar al adaptador que se añadio un nuevo item
-    private fun updateTask() {
-        //Esto comprueba uno a uno -> No Optimo
-        taskAdapter.notifyDataSetChanged()
-    }
-
 
     private fun onItemSelected(position: Int) {
         tasks[position].isSelected = !tasks[position].isSelected
         //Notificar cambios
         updateTask()
+    }
+
+    //Solo modificamos un valor
+    private fun updateCategories(position: Int) {
+        categories[position].isSelected = !categories[position].isSelected
+        //Notificar solo un objeto modificado
+        categoriesAdapter.notifyItemChanged(position)
+        updateTask()
+
+    }
+
+    //Avisar al adaptador que se añadio un nuevo item
+    private fun updateTask() {
+        //Filtrar cada una que este selecionada
+        val selectedCategories: List<TaskCategory> = categories.filter { it.isSelected }
+        val newTasks = tasks.filter { selectedCategories.contains(it.category) }
+        taskAdapter.tasks = newTasks
+        //Esto comprueba uno a uno -> No Optimo
+        taskAdapter.notifyDataSetChanged()
     }
 
 }

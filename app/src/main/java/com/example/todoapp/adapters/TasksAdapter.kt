@@ -7,7 +7,9 @@ import com.example.todoapp.Task
 import com.example.todoapp.TasksViewHolder
 import com.example.todoapp.R
 
-class TasksAdapter(private val tasks: List<Task>) : RecyclerView.Adapter<TasksViewHolder>() {
+// Funcion lambda que va a devolver un Int -> private val onTaskSelected: (Int) -> Unit
+class TasksAdapter(var tasks: List<Task>, private val onTaskSelected: (Int) -> Unit) :
+    RecyclerView.Adapter<TasksViewHolder>() {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -23,6 +25,10 @@ class TasksAdapter(private val tasks: List<Task>) : RecyclerView.Adapter<TasksVi
         position: Int
     ) {
         holder.render(tasks[position])
+        //Item view es toda la celda el contenido
+        holder.itemView.setOnClickListener {
+            onTaskSelected(position)
+        }
     }
 
     override fun getItemCount() = tasks.size

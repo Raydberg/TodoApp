@@ -7,7 +7,10 @@ import com.example.todoapp.CategoriesViewHolder
 import com.example.todoapp.TaskCategory
 import com.example.todoapp.R
 
-class CategoriesAdapter(private val categories: List<TaskCategory>) :
+class CategoriesAdapter(
+    private val categories: List<TaskCategory>,
+    private val onItemSelected: (Int) -> Unit
+) :
     RecyclerView.Adapter<CategoriesViewHolder>() {
 
     // Crea nuevas "cajas"(ViewHolder) para mostrar cada categoria
@@ -29,7 +32,10 @@ class CategoriesAdapter(private val categories: List<TaskCategory>) :
         position: Int
     ) {
         //Seria como llamar a cada uno de los items
-        holder.render(categories[position])
+        //Mandar la fucnion lambdan mas lejos
+        // onItemSelected -> Solo mandar
+        // onItemSelected() -> Ejecutar
+        holder.render(categories[position], onItemSelected)
     }
 
     // Informa cuantas categorias hay en total
